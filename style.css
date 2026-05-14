@@ -1612,3 +1612,307 @@ button, a, div { -webkit-tap-highlight-color: transparent; outline: none; }
     object-fit: cover;
     border: 2px solid #4ade80;
 }
+/* CHAT MESSAGES - SEPERTI TELEGRAM */
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.message {
+    display: flex;
+    width: 100%;
+    margin-bottom: 4px;
+}
+
+/* Pesan kita sendiri (OWN) - di kanan */
+.message.own {
+    justify-content: flex-end;
+}
+
+/* Pesan lawan (OTHER) - di kiri */
+.message.other {
+    justify-content: flex-start;
+}
+
+.message-bubble {
+    max-width: 75%;
+    padding: 10px 14px;
+    border-radius: 18px;
+    position: relative;
+    word-wrap: break-word;
+}
+
+/* Bubble kita - hijau di kanan */
+.message.own .message-bubble {
+    background: #0a6b42;
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+/* Bubble lawan - abu di kiri */
+.message.other .message-bubble {
+    background: #2a2a2a;
+    color: #e0e0e0;
+    border-bottom-left-radius: 4px;
+}
+
+.message-time {
+    font-size: 10px;
+    opacity: 0.7;
+    margin-left: 8px;
+}
+
+/* Status centang (optional) */
+.message .fa-check-double {
+    font-size: 10px;
+    margin-left: 6px;
+    color: #888;
+}
+
+.message .fa-check-double.read {
+    color: #34b7f1;
+}
+
+/* Chat input area */
+.chat-input-area {
+    display: flex;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #2a2a2a;
+    border-top: 1px solid #3a3a3a;
+}
+
+.chat-input {
+    flex: 1;
+    padding: 12px 16px;
+    background: #353535;
+    border: none;
+    border-radius: 24px;
+    color: white;
+    font-size: 15px;
+    outline: none;
+}
+
+.chat-input:focus {
+    border: 1px solid #4ade80;
+}
+
+.send-btn {
+    width: 44px;
+    height: 44px;
+    background: #4ade80;
+    border: none;
+    border-radius: 50%;
+    color: #1a1a1a;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.2s;
+}
+
+.send-btn:hover {
+    background: #22c55e;
+    transform: scale(1.05);
+}
+/* CHAT ROOM STYLES - SEPERTI TELEGRAM */
+/* ========== CHAT ROOM STYLES (PERSONAL CHAT) ========== */
+.chat-room {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #1a1a1a;
+    z-index: 400;
+    display: none;
+    flex-direction: column;
+}
+
+.chat-room-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #2a2a2a;
+    border-bottom: 1px solid #3a3a3a;
+}
+
+.back-chat-btn {
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 8px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.back-chat-btn:hover {
+    background: #3a3a3a;
+    color: white;
+}
+
+.chat-room-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    justify-content: center;
+}
+
+.chat-room-avatar {
+    position: relative;
+    width: 40px;
+    height: 40px;
+}
+
+.chat-room-avatar i {
+    font-size: 40px;
+    color: #aaa;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.chat-room-avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.chat-room-user h4 {
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.chat-room-user small {
+    font-size: 11px;
+    color: #4ade80;
+}
+
+/* Chat messages container */
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Message bubbles - seperti Telegram */
+.message {
+    display: flex;
+    width: 100%;
+    margin-bottom: 4px;
+}
+
+/* Pesan kita (OWN) - di kanan */
+.message.own {
+    justify-content: flex-end;
+}
+
+/* Pesan lawan (OTHER) - di kiri */
+.message.other {
+    justify-content: flex-start;
+}
+
+.message-bubble {
+    max-width: 75%;
+    padding: 10px 14px;
+    border-radius: 18px;
+    position: relative;
+    word-wrap: break-word;
+}
+
+/* Bubble kita - hijau di kanan */
+.message.own .message-bubble {
+    background: #0a6b42;
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+/* Bubble lawan - abu di kiri */
+.message.other .message-bubble {
+    background: #2a2a2a;
+    color: #e0e0e0;
+    border-bottom-left-radius: 4px;
+}
+
+.message-time {
+    font-size: 10px;
+    opacity: 0.7;
+    margin-left: 8px;
+}
+
+.message .fa-check-double {
+    font-size: 10px;
+    margin-left: 6px;
+    color: #888;
+}
+
+.message .fa-check-double.read {
+    color: #34b7f1;
+}
+
+/* Chat input area */
+.chat-input-area {
+    display: flex;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #2a2a2a;
+    border-top: 1px solid #3a3a3a;
+}
+
+.chat-input {
+    flex: 1;
+    padding: 12px 16px;
+    background: #353535;
+    border: none;
+    border-radius: 24px;
+    color: white;
+    font-size: 15px;
+    outline: none;
+}
+
+.chat-input:focus {
+    border: 1px solid #4ade80;
+}
+
+.send-btn {
+    width: 44px;
+    height: 44px;
+    background: #4ade80;
+    border: none;
+    border-radius: 50%;
+    color: #1a1a1a;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.2s;
+}
+
+.send-btn:hover {
+    background: #22c55e;
+    transform: scale(1.05);
+}
+
+.loading-messages, .empty-messages {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}

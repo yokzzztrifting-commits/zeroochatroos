@@ -75,11 +75,6 @@ async function getAllUsers(excludePhone = null) {
     return users;
 }
 
-async function getUserByPhone(phone) {
-    const snapshot = await database.ref('users/' + phone).once('value');
-    return snapshot.val();
-}
-
 // ========== CONTACTS MANAGEMENT ==========
 async function addContact(userPhone, contactPhone) {
     const contactExists = await isUserRegistered(contactPhone);
@@ -107,6 +102,7 @@ async function getContacts(userPhone) {
         });
     });
     
+    // Ambil detail user untuk setiap contact
     const contactsWithDetails = [];
     for (const contact of contacts) {
         const userDetail = await getUserByPhone(contact.phone);
@@ -115,11 +111,13 @@ async function getContacts(userPhone) {
                 phone: contact.phone,
                 name: userDetail.name,
                 status: userDetail.status || 'offline',
-                addedAt: contact.addedAt
+                addedAt: contact.addedAt,
+                avatar: userDetail.avatar
             });
         }
     }
     
+    console.log('Contacts with details:', contactsWithDetails);
     return contactsWithDetails;
 }
 
@@ -389,13 +387,14 @@ async function getActivePromotions() {
     return promotions;
 }
 
-//// ========== AVATAR FUNCTIONS ==========
+// ========== AVATAR FUNCTIONS ==========
 async function updateUserName(phone, newName) {
     await database.ref('users/' + phone + '/name').set(newName);
     await logActivity(phone, 'update_name', { newName: newName });
 }
 
 async function updateUserAvatar(phone, avatarBase64) {
+    // Simpan langsung ke database (permanen)
     await database.ref('users/' + phone + '/avatar').set(avatarBase64);
     await database.ref('users/' + phone + '/avatarUpdatedAt').set(new Date().toISOString());
     await logActivity(phone, 'update_avatar', {});
@@ -405,13 +404,27 @@ async function updateUserAvatar(phone, avatarBase64) {
 async function getUserAvatar(phone) {
     const snapshot = await database.ref('users/' + phone + '/avatar').once('value');
     const avatar = snapshot.val();
-    if (!avatar || avatar === 'default' || avatar === 'null' || avatar === 'undefined') {
+    // Return null jika default atau tidak ada
+    if (!avatar || avatar === 'default' || avatar === 'null' || avatar === 'undefined' || avatar === '') {
         return null;
     }
     return avatar;
 }
 
-// ... lalu setelah semua fungsi, baru window.FirebaseAPI
+async function deleteUserAvatar(phone) {
+    await database.ref('users/' + phone + '/avatar').remove();
+    await logActivity(phone, 'delete_avatar', {});
+}
+
+// UPDATE juga fungsi getUserByPhone untuk include avatar
+async function getUserByPhone(phone) {
+    const snapshot = await database.ref('users/' + phone).once('value');
+    const userData = snapshot.val();
+    if (userData && userData.avatar === 'default') {
+        userData.avatar = null;
+    }
+    return userData;
+}
 
 // ========== CHANNEL MESSAGES ==========
 async function sendChannelMessage(channelId, senderPhone, message, type = 'text', mediaUrl = null) {

@@ -94,459 +94,479 @@
         </div>
     </div>
     
-    <!-- Register Form (hidden dulu) -->
-<div class="register-form" id="registerForm" style="display: none;">
-    <div class="form-card">
-        <button class="back-to-welcome" id="backToWelcome">
-            <i class="fas fa-arrow-left"></i>
-        </button>
-        
-        <div class="form-header">
-            <i class="fas fa-comments"></i>
-            <h2>Daftar Zeroo</h2>
-            <p>Verifikasi nomor Zeroo kamu Menggunakan whatsapp</p>
-        </div>
+    <!-- Register Form -->
+    <div class="register-form" id="registerForm" style="display: none;">
+        <div class="form-card">
+            <button class="back-to-welcome" id="backToWelcome">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            
+            <div class="form-header">
+                <i class="fas fa-comments"></i>
+                <h2>Daftar Zeroo</h2>
+                <p>Verifikasi nomor Zeroo kamu Menggunakan whatsapp</p>
+            </div>
 
-        <!-- Step 1: Input Nomor -->
-        <div id="regStep1">
-            <div class="input-group">
-                <label>Nomor WhatsApp</label>
-                <div class="phone-wrapper">
-                    <span>+62</span>
-                    <input type="tel" id="regPhone" placeholder="81234567890">
+            <div id="regStep1">
+                <div class="input-group">
+                    <label>Nomor WhatsApp</label>
+                    <div class="phone-wrapper">
+                        <span>+62</span>
+                        <input type="tel" id="regPhone" placeholder="81234567890">
+                    </div>
+                </div>
+                <button class="btn-reg" id="sendOtpReg">Kirim OTP <i class="fas fa-paper-plane"></i></button>
+            </div>
+
+            <div id="regStep2" style="display: none;">
+                <div class="input-group">
+                    <label>Kode OTP</label>
+                    <div class="otp-group">
+                        <input type="text" maxlength="1" class="otp-field">
+                        <input type="text" maxlength="1" class="otp-field">
+                        <input type="text" maxlength="1" class="otp-field">
+                        <input type="text" maxlength="1" class="otp-field">
+                        <input type="text" maxlength="1" class="otp-field">
+                        <input type="text" maxlength="1" class="otp-field">
+                    </div>
+                </div>
+                <button class="btn-reg" id="verifyOtpReg">Verifikasi <i class="fas fa-check"></i></button>
+                <div class="timer-wrapper">
+                    <span id="timer"></span>
+                    <button id="resendOtp" style="display: none;">Kirim Ulang</button>
                 </div>
             </div>
-            <button class="btn-reg" id="sendOtpReg">Kirim OTP <i class="fas fa-paper-plane"></i></button>
-        </div>
 
-        <!-- Step 2: Input OTP -->
-        <div id="regStep2" style="display: none;">
-            <div class="input-group">
-                <label>Kode OTP</label>
-                <div class="otp-group">
-                    <input type="text" maxlength="1" class="otp-field">
-                    <input type="text" maxlength="1" class="otp-field">
-                    <input type="text" maxlength="1" class="otp-field">
-                    <input type="text" maxlength="1" class="otp-field">
-                    <input type="text" maxlength="1" class="otp-field">
-                    <input type="text" maxlength="1" class="otp-field">
+            <div id="regMessage" class="message-box"></div>
+        </div>
+    </div>
+
+    <!-- Login Form -->
+    <div class="login-form" id="loginForm" style="display: none;">
+        <div class="form-card">
+            <button class="back-to-welcome" id="backToWelcomeLogin">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            
+            <div class="form-header">
+                <i class="fas fa-sign-in-alt"></i>
+                <h2>Masuk Zeroo</h2>
+                <p>Masukkan nomor WhatsApp kamu</p>
+            </div>
+
+            <div id="loginStep1">
+                <div class="input-group">
+                    <label>Nomor WhatsApp</label>
+                    <div class="phone-wrapper">
+                        <span>+62</span>
+                        <input type="tel" id="loginPhone" placeholder="81234567890">
+                    </div>
+                </div>
+                <button class="btn-reg" id="sendOtpLogin">Kirim OTP <i class="fas fa-paper-plane"></i></button>
+            </div>
+
+            <div id="loginStep2" style="display: none;">
+                <div class="input-group">
+                    <label>Kode OTP</label>
+                    <div class="otp-group">
+                        <input type="text" maxlength="1" class="otp-field-login">
+                        <input type="text" maxlength="1" class="otp-field-login">
+                        <input type="text" maxlength="1" class="otp-field-login">
+                        <input type="text" maxlength="1" class="otp-field-login">
+                        <input type="text" maxlength="1" class="otp-field-login">
+                        <input type="text" maxlength="1" class="otp-field-login">
+                    </div>
+                </div>
+                <button class="btn-reg" id="verifyOtpLogin">Verifikasi <i class="fas fa-check"></i></button>
+                <div class="timer-wrapper">
+                    <span id="timerLogin"></span>
+                    <button id="resendOtpLogin" style="display: none;">Kirim Ulang</button>
                 </div>
             </div>
-            <button class="btn-reg" id="verifyOtpReg">Verifikasi <i class="fas fa-check"></i></button>
-            <div class="timer-wrapper">
-                <span id="timer"></span>
-                <button id="resendOtp" style="display: none;">Kirim Ulang</button>
-            </div>
-        </div>
 
-        <div id="regMessage" class="message-box"></div>
+            <div id="loginMessage" class="message-box"></div>
+        </div>
     </div>
-</div>
 
-<!-- Login Form -->
-<div class="login-form" id="loginForm" style="display: none;">
-    <div class="form-card">
-        <button class="back-to-welcome" id="backToWelcomeLogin">
-            <i class="fas fa-arrow-left"></i>
-        </button>
-        
-        <div class="form-header">
-            <i class="fas fa-sign-in-alt"></i>
-            <h2>Masuk Zeroo</h2>
-            <p>Masukkan nomor WhatsApp kamu</p>
-        </div>
-
-        <!-- Step Login 1: Input Nomor -->
-        <div id="loginStep1">
-            <div class="input-group">
-                <label>Nomor WhatsApp</label>
-                <div class="phone-wrapper">
-                    <span>+62</span>
-                    <input type="tel" id="loginPhone" placeholder="81234567890">
+    <!-- DASHBOARD MAIN APP -->
+    <div class="dashboard-app" id="dashboardApp" style="display: none;">
+        <div class="dashboard-header">
+            <div class="user-info" id="userInfoBtn" style="cursor: pointer;">
+                <div class="user-avatar" id="userAvatar">
+                    <i class="fas fa-user-circle"></i>
+                    <img id="userAvatarImg" style="display: none; width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                </div>
+                <div>
+                    <span class="user-name" id="userName">User</span>
+                    <span class="user-status">Online</span>
                 </div>
             </div>
-            <button class="btn-reg" id="sendOtpLogin">Kirim OTP <i class="fas fa-paper-plane"></i></button>
+            <div class="header-actions">
+                <i class="fas fa-plus-circle" id="addContactBtn"></i>
+                <i class="fas fa-search" id="searchIcon"></i>
+                <i class="fas fa-sign-out-alt" id="logoutBtn"></i>
+            </div>
         </div>
 
-        <!-- Step Login 2: Input OTP -->
-        <div id="loginStep2" style="display: none;">
-            <div class="input-group">
-                <label>Kode OTP</label>
-                <div class="otp-group">
-                    <input type="text" maxlength="1" class="otp-field-login">
-                    <input type="text" maxlength="1" class="otp-field-login">
-                    <input type="text" maxlength="1" class="otp-field-login">
-                    <input type="text" maxlength="1" class="otp-field-login">
-                    <input type="text" maxlength="1" class="otp-field-login">
-                    <input type="text" maxlength="1" class="otp-field-login">
+        <div class="content-container" id="contentContainer">
+            <!-- Page Dashboard -->
+            <div class="page page-dashboard active-page">
+                <div class="welcome-banner">
+                    <h3>Selamat Datang, <span id="welcomeName">User</span>!</h3>
+                    <p>Mulai chatting dengan teman-temanmu</p>
+                </div>
+                <div class="chat-list" id="chatList">
+                    <div class="loading-contacts">
+                        <i class="fas fa-spinner fa-spin"></i> Memuat kontak...
+                    </div>
                 </div>
             </div>
-            <button class="btn-reg" id="verifyOtpLogin">Verifikasi <i class="fas fa-check"></i></button>
-            <div class="timer-wrapper">
-                <span id="timerLogin"></span>
-                <button id="resendOtpLogin" style="display: none;">Kirim Ulang</button>
+
+            <!-- Page Channel -->
+            <div class="page page-channel">
+                <div class="channel-header">
+                    <h3>Channel</h3>
+                    <i class="fas fa-plus" id="createChannelBtn"></i>
+                </div>
+                <div class="channel-list" id="channelList">
+                    <div class="loading-contacts">
+                        <i class="fas fa-spinner fa-spin"></i> Memuat channel...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page Promote -->
+            <div class="page page-promote">
+                <div class="promote-header">
+                    <h3>Promote</h3>
+                    <i class="fas fa-cog"></i>
+                </div>
+                <div class="promote-card">
+                    <i class="fas fa-rocket"></i>
+                    <h4>Promosikan Channelmu</h4>
+                    <p>Dapatkan lebih banyak member dengan mempromosikan channel kamu disini</p>
+                    <button class="promote-btn">Mulai Promosi</button>
+                </div>
+                <div class="stats-card">
+                    <div class="stat">
+                        <span>Total Views</span>
+                        <strong>0</strong>
+                    </div>
+                    <div class="stat">
+                        <span>Promosi Aktif</span>
+                        <strong>0</strong>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div id="loginMessage" class="message-box"></div>
-    </div>
-</div>
-
-<!-- DASHBOARD MAIN APP -->
-<div class="dashboard-app" id="dashboardApp" style="display: none;">
-<!-- Top Bar -->
-<div class="dashboard-header">
-<div class="user-info" id="userInfoBtn" style="cursor: pointer;">
-    <div class="user-avatar" id="userAvatar">
-        <i class="fas fa-user-circle"></i>
-        <img id="userAvatarImg" style="display: none; width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
-    </div>
-    <div>
-        <span class="user-name" id="userName">User</span>
-        <span class="user-status">Online</span>
-    </div>
-</div>
-    <div class="header-actions">
-        <i class="fas fa-plus-circle" id="addContactBtn"></i>
-        <i class="fas fa-search" id="searchIcon"></i>
-        <i class="fas fa-sign-out-alt" id="logoutBtn"></i>
-    </div>
-</div>
-
-    <!-- Content Pages -->
-    <div class="content-container" id="contentContainer">
-        <!-- Page Dashboard -->
-        <div class="page page-dashboard active-page">
-            <div class="welcome-banner">
-                <h3>Selamat Datang, <span id="welcomeName">User</span>!</h3>
-                <p>Mulai chatting dengan teman-temanmu</p>
+        <!-- Bottom Navbar -->
+        <div class="bottom-nav">
+            <div class="nav-item active" data-page="dashboard">
+                <i class="fas fa-user"></i>
+                <span>Dashboard</span>
             </div>
-        </div>
-
-<!-- Page Channel -->
-<div class="page page-channel">
-    <div class="channel-header">
-        <h3>Channel</h3>
-        <i class="fas fa-plus" id="createChannelBtn"></i>
-    </div>
-    <div class="channel-list" id="channelList">
-        <div class="loading-contacts">
-            <i class="fas fa-spinner fa-spin"></i> Memuat channel...
-        </div>
-    </div>
-</div>
-
-        <!-- Page Promote -->
-        <div class="page page-promote">
-            <div class="promote-header">
-                <h3>Promote</h3>
-                <i class="fas fa-cog"></i>
+            <div class="nav-item" data-page="channel">
+                <i class="fas fa-hashtag"></i>
+                <span>Channel</span>
             </div>
-            <div class="promote-card">
+            <div class="nav-item" data-page="promote">
                 <i class="fas fa-rocket"></i>
-                <h4>Promosikan Channelmu</h4>
-                <p>Dapatkan lebih banyak member dengan mempromosikan channel kamu disini</p>
-                <button class="promote-btn">Mulai Promosi</button>
-            </div>
-            <div class="stats-card">
-                <div class="stat">
-                    <span>Total Views</span>
-                    <strong>0</strong>
-                </div>
-                <div class="stat">
-                    <span>Promosi Aktif</span>
-                    <strong>0</strong>
-                </div>
+                <span>Promote</span>
             </div>
         </div>
     </div>
 
-    <!-- Bottom Navbar -->
-    <div class="bottom-nav">
-        <div class="nav-item active" data-page="dashboard">
-            <i class="fas fa-user"></i>
-            <span>Dashboard</span>
-        </div>
-        <div class="nav-item" data-page="channel">
-            <i class="fas fa-hashtag"></i>
-            <span>Channel</span>
-        </div>
-        <div class="nav-item" data-page="promote">
-            <i class="fas fa-chart-line"></i>
-            <span>Promote</span>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Tambah Kontak -->
-<div class="modal-overlay" id="contactModal" style="display: none;">
-    <div class="modal-container">
-        <div class="modal-header">
-            <h3><i class="fas fa-user-plus"></i> Tambah Kontak</h3>
-            <button class="modal-close" id="closeModalBtn">&times;</button>
-        </div>
-        <div class="modal-body">
-            <div class="search-contact">
-                <input type="text" id="searchContactInput" placeholder="Cari nomor WhatsApp...">
-                <i class="fas fa-search"></i>
+    <!-- Modal Tambah Kontak -->
+    <div class="modal-overlay" id="contactModal" style="display: none;">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> Tambah Kontak</h3>
+                <button class="modal-close" id="closeModalBtn">&times;</button>
             </div>
-            <div class="contact-list" id="contactList">
-                <div class="loading-contacts">
-                    <i class="fas fa-spinner fa-spin"></i> Memuat daftar user...
+            <div class="modal-body">
+                <div class="search-contact">
+                    <input type="text" id="searchContactInput" placeholder="Cari nomor WhatsApp...">
+                    <i class="fas fa-search"></i>
                 </div>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-cancel" id="cancelModalBtn">Batal</button>
-        </div>
-    </div>
-</div>
-
-<!-- PROFILE SETTINGS SCREEN (Full Screen) -->
-<div class="profile-screen" id="profileScreen" style="display: none;">
-    <div class="profile-header">
-        <button class="profile-back-btn" id="profileBackBtn">
-            <i class="fas fa-arrow-left"></i>
-        </button>
-        <h3>Profile Settings</h3>
-        <button class="profile-save-btn" id="profileSaveBtn">
-            <i class="fas fa-check"></i>
-        </button>
-    </div>
-    
-    <div class="profile-content">
-        <!-- Avatar Section -->
-        <div class="profile-avatar-section">
-            <div class="profile-avatar" id="profileAvatar">
-                <img id="profileAvatarImg" src="" alt="Avatar">
-                <div class="avatar-overlay" id="changePhotoBtn">
-                    <i class="fas fa-camera"></i>
-                    <span>Ganti Foto</span>
-                </div>
-            </div>
-            <input type="file" id="profilePhotoInput" accept="image/jpeg,image/png,image/jpg" style="display: none;">
-        </div>
-        
-        <!-- Name Section -->
-        <div class="profile-info-section">
-            <div class="profile-field">
-                <label>Nama</label>
-                <div class="profile-field-input">
-                    <input type="text" id="profileNameInput" placeholder="Masukkan nama Anda">
-                    <i class="fas fa-pencil-alt"></i>
-                </div>
-                <small>Nama akan terlihat oleh kontak Anda</small>
-            </div>
-            
-            <div class="profile-field">
-                <label>Nomor WhatsApp</label>
-                <div class="profile-field-display">
-                    <span id="profilePhoneDisplay">+62</span>
-                    <i class="fas fa-lock"></i>
-                </div>
-                <small>Nomor tidak dapat diubah</small>
-            </div>
-            
-            <div class="profile-field">
-                <label>Bergabung sejak</label>
-                <div class="profile-field-display">
-                    <span id="profileJoinDate">-</span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Divider -->
-        <div class="profile-divider"></div>
-        
-        <!-- Other Options -->
-        <div class="profile-options">
-            <div class="profile-option-item" id="logoutOption">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Keluar dari Zeroo</span>
-                <i class="fas fa-chevron-right"></i>
-            </div>
-        </div>
-        
-        <div class="profile-version">
-            <small>Version 1.0.0</small>
-        </div>
-    </div>
-</div>
-
-<!-- CREATE CHANNEL MODAL -->
-<div class="modal-overlay" id="createChannelModal" style="display: none;">
-    <div class="modal-container">
-        <div class="modal-header">
-            <h3><i class="fas fa-plus-circle"></i> Buat Channel Baru</h3>
-            <button class="modal-close" id="closeCreateChannelBtn">&times;</button>
-        </div>
-        <div class="modal-body">
-            <div class="form-group">
-                <label>Nama Channel</label>
-                <input type="text" id="channelName" placeholder="Contoh: Zeroo Update" class="channel-input">
-            </div>
-            <div class="form-group">
-                <label>Deskripsi</label>
-                <textarea id="channelDesc" rows="3" placeholder="Deskripsi channel..." class="channel-textarea"></textarea>
-            </div>
-            <div class="form-group">
-                <label>Foto Channel</label>
-                <div class="channel-avatar-picker" id="channelAvatarPicker">
-                    <i class="fas fa-camera"></i>
-                    <span>Upload Foto</span>
-                </div>
-                <input type="file" id="channelPhotoInput" accept="image/*" style="display: none;">
-                <img id="channelAvatarPreview" style="display: none; width: 60px; height: 60px; border-radius: 50%; margin-top: 10px;">
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-cancel" id="cancelCreateChannelBtn">Batal</button>
-            <button class="btn-primary" id="confirmCreateChannelBtn">Buat Channel</button>
-        </div>
-    </div>
-</div>
-
-<!-- CHANNEL VIEW SCREEN -->
-<div class="channel-view-screen" id="channelViewScreen" style="display: none;">
-    <div class="channel-view-header">
-        <button class="channel-back-btn" id="channelBackBtn">
-            <i class="fas fa-arrow-left"></i>
-        </button>
-        <div class="channel-view-info">
-            <img id="channelViewAvatar" src="" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
-            <div>
-                <h3 id="channelViewName">Channel Name</h3>
-                <span id="channelViewMemberCount">0 members</span>
-            </div>
-        </div>
-        <div class="channel-view-actions">
-            <i class="fas fa-ellipsis-v" id="channelMenuBtn"></i>
-        </div>
-    </div>
-    
-    <!-- Channel Menu Dropdown -->
-    <div class="channel-menu-dropdown" id="channelMenuDropdown" style="display: none;">
-        <div class="menu-item" id="editChannelInfoBtn"><i class="fas fa-edit"></i> Edit Channel</div>
-        <div class="menu-item" id="createPollBtn"><i class="fas fa-chart-bar"></i> Buat Voting</div>
-        <div class="menu-item" id="viewPollsBtn"><i class="fas fa-poll"></i> Lihat Voting</div>
-        <div class="menu-item danger" id="deleteChannelBtn"><i class="fas fa-trash"></i> Hapus Channel</div>
-    </div>
-    
-    <!-- Messages -->
-    <div class="channel-messages" id="channelMessages">
-        <div class="loading-messages"><i class="fas fa-spinner fa-spin"></i> Memuat pesan...</div>
-    </div>
-    
-
-<div class="channel-input-area" id="channelInputArea">
-    <div class="input-container">
-        <div class="media-buttons">
-            <button class="media-btn" id="channelImageBtn">
-                <i class="fas fa-image"></i>
-            </button>
-            <button class="media-btn" id="channelVideoBtn">
-                <i class="fas fa-video"></i>
-            </button>
-            <button class="media-btn" id="channelPollBtn">
-                <i class="fas fa-chart-bar"></i>
-            </button>
-        </div>
-        <input type="text" id="channelMessageInput" placeholder="Pesan..." class="message-input" autocomplete="off">
-        <button id="channelSendBtn" class="send-message-btn">
-            <i class="fas fa-paper-plane"></i>
-        </button>
-    </div>
-    <input type="file" id="channelMediaInput" accept="image/*,video/*" style="display: none;">
-</div>
-
-<!-- Edit Channel Modal -->
-<div class="modal-overlay" id="editChannelModal" style="display: none;">
-    <div class="modal-container">
-        <div class="modal-header">
-            <h3>Edit Channel</h3>
-            <button class="modal-close" id="closeEditChannelBtn">&times;</button>
-        </div>
-        <div class="modal-body">
-            <div class="form-group">
-                <label>Nama Channel</label>
-                <input type="text" id="editChannelName" class="channel-input">
-            </div>
-            <div class="form-group">
-                <label>Deskripsi</label>
-                <textarea id="editChannelDesc" rows="3" class="channel-textarea"></textarea>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-cancel" id="cancelEditChannelBtn">Batal</button>
-            <button class="btn-primary" id="saveEditChannelBtn">Simpan</button>
-        </div>
-    </div>
-</div>
-
-<!-- Voting Modal -->
-<div class="modal-overlay" id="votingModal" style="display: none;">
-    <div class="modal-container">
-        <div class="modal-header">
-            <h3 id="votingModalTitle">Buat Voting</h3>
-            <button class="modal-close" id="closeVotingModalBtn">&times;</button>
-        </div>
-        <div class="modal-body">
-            <div class="form-group">
-                <label>Pertanyaan</label>
-                <input type="text" id="pollQuestion" class="channel-input" placeholder="Apa pertanyaanmu?">
-            </div>
-            <div class="form-group">
-                <label>Pilihan</label>
-                <div id="pollOptionsList">
-                    <div class="poll-option-input">
-                        <input type="text" class="poll-option" placeholder="Pilihan 1">
-                    </div>
-                    <div class="poll-option-input">
-                        <input type="text" class="poll-option" placeholder="Pilihan 2">
+                <div class="contact-list" id="contactList">
+                    <div class="loading-contacts">
+                        <i class="fas fa-spinner fa-spin"></i> Memuat daftar user...
                     </div>
                 </div>
-                <button class="add-option-btn" id="addPollOptionBtn">+ Tambah Pilihan</button>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="cancelModalBtn">Batal</button>
             </div>
         </div>
-        <div class="modal-footer">
-            <button class="btn-cancel" id="cancelVotingBtn">Batal</button>
-            <button class="btn-primary" id="createPollSubmitBtn">Buat Voting</button>
+    </div>
+
+    <!-- PROFILE SETTINGS SCREEN -->
+    <div class="profile-screen" id="profileScreen" style="display: none;">
+        <div class="profile-header">
+            <button class="profile-back-btn" id="profileBackBtn">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h3>Profile Settings</h3>
+            <button class="profile-save-btn" id="profileSaveBtn">
+                <i class="fas fa-check"></i>
+            </button>
+        </div>
+        
+        <div class="profile-content">
+            <div class="profile-avatar-section">
+                <div class="profile-avatar" id="profileAvatar">
+                    <img id="profileAvatarImg" src="" alt="Avatar">
+                    <div class="avatar-overlay" id="changePhotoBtn">
+                        <i class="fas fa-camera"></i>
+                        <span>Ganti Foto</span>
+                    </div>
+                </div>
+                <input type="file" id="profilePhotoInput" accept="image/jpeg,image/png,image/jpg" style="display: none;">
+            </div>
+            
+            <div class="profile-info-section">
+                <div class="profile-field">
+                    <label>Nama</label>
+                    <div class="profile-field-input">
+                        <input type="text" id="profileNameInput" placeholder="Masukkan nama Anda">
+                        <i class="fas fa-pencil-alt"></i>
+                    </div>
+                    <small>Nama akan terlihat oleh kontak Anda</small>
+                </div>
+                
+                <div class="profile-field">
+                    <label>Nomor WhatsApp</label>
+                    <div class="profile-field-display">
+                        <span id="profilePhoneDisplay">+62</span>
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <small>Nomor tidak dapat diubah</small>
+                </div>
+                
+                <div class="profile-field">
+                    <label>Bergabung sejak</label>
+                    <div class="profile-field-display">
+                        <span id="profileJoinDate">-</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="profile-divider"></div>
+            
+            <div class="profile-options">
+                <div class="profile-option-item" id="logoutOption">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Keluar dari Zeroo</span>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+            
+            <div class="profile-version">
+                <small>Version 1.0.0</small>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- View Polls Modal -->
-<div class="modal-overlay" id="viewPollsModal" style="display: none;">
-    <div class="modal-container modal-large">
-        <div class="modal-header">
-            <h3>Daftar Voting</h3>
-            <button class="modal-close" id="closeViewPollsBtn">&times;</button>
-        </div>
-        <div class="modal-body" id="pollsListContainer">
-            <div class="loading-polls">Memuat voting...</div>
+    <!-- CREATE CHANNEL MODAL -->
+    <div class="modal-overlay" id="createChannelModal" style="display: none;">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus-circle"></i> Buat Channel Baru</h3>
+                <button class="modal-close" id="closeCreateChannelBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Nama Channel</label>
+                    <input type="text" id="channelName" placeholder="Contoh: Zeroo Update" class="channel-input">
+                </div>
+                <div class="form-group">
+                    <label>Deskripsi</label>
+                    <textarea id="channelDesc" rows="3" placeholder="Deskripsi channel..." class="channel-textarea"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Foto Channel</label>
+                    <div class="channel-avatar-picker" id="channelAvatarPicker">
+                        <i class="fas fa-camera"></i>
+                        <span>Upload Foto</span>
+                    </div>
+                    <input type="file" id="channelPhotoInput" accept="image/*" style="display: none;">
+                    <img id="channelAvatarPreview" style="display: none; width: 60px; height: 60px; border-radius: 50%; margin-top: 10px;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="cancelCreateChannelBtn">Batal</button>
+                <button class="btn-primary" id="confirmCreateChannelBtn">Buat Channel</button>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Reaction Picker -->
-<div class="reaction-picker" id="reactionPicker" style="display: none;">
-    <div class="reaction-option" data-reaction="👍">👍</div>
-    <div class="reaction-option" data-reaction="❤️">❤️</div>
-    <div class="reaction-option" data-reaction="😂">😂</div>
-    <div class="reaction-option" data-reaction="😮">😮</div>
-    <div class="reaction-option" data-reaction="😢">😢</div>
-    <div class="reaction-option" data-reaction="🙏">🙏</div>
-</div>
+    <!-- CHANNEL VIEW SCREEN -->
+    <div class="channel-view-screen" id="channelViewScreen" style="display: none;">
+        <div class="channel-view-header">
+            <button class="channel-back-btn" id="channelBackBtn">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="channel-view-info">
+                <img id="channelViewAvatar" src="" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                <div>
+                    <h3 id="channelViewName">Channel Name</h3>
+                    <span id="channelViewMemberCount">0 members</span>
+                </div>
+            </div>
+            <div class="channel-view-actions">
+                <i class="fas fa-ellipsis-v" id="channelMenuBtn"></i>
+            </div>
+        </div>
+        
+        <div class="channel-menu-dropdown" id="channelMenuDropdown" style="display: none;">
+            <div class="menu-item" id="editChannelInfoBtn"><i class="fas fa-edit"></i> Edit Channel</div>
+            <div class="menu-item" id="createPollBtn"><i class="fas fa-chart-bar"></i> Buat Voting</div>
+            <div class="menu-item" id="viewPollsBtn"><i class="fas fa-poll"></i> Lihat Voting</div>
+            <div class="menu-item danger" id="deleteChannelBtn"><i class="fas fa-trash"></i> Hapus Channel</div>
+        </div>
+        
+        <div class="channel-messages" id="channelMessages">
+            <div class="loading-messages"><i class="fas fa-spinner fa-spin"></i> Memuat pesan...</div>
+        </div>
+        
+        <div class="channel-input-area" id="channelInputArea">
+            <div class="input-container">
+                <div class="media-buttons">
+                    <button class="media-btn" id="channelImageBtn">
+                        <i class="fas fa-image"></i>
+                    </button>
+                    <button class="media-btn" id="channelVideoBtn">
+                        <i class="fas fa-video"></i>
+                    </button>
+                    <button class="media-btn" id="channelPollBtn">
+                        <i class="fas fa-chart-bar"></i>
+                    </button>
+                </div>
+                <input type="text" id="channelMessageInput" placeholder="Pesan..." class="message-input" autocomplete="off">
+                <button id="channelSendBtn" class="send-message-btn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+            <input type="file" id="channelMediaInput" accept="image/*,video/*" style="display: none;">
+        </div>
+    </div>
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <!-- Edit Channel Modal -->
+    <div class="modal-overlay" id="editChannelModal" style="display: none;">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>Edit Channel</h3>
+                <button class="modal-close" id="closeEditChannelBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Nama Channel</label>
+                    <input type="text" id="editChannelName" class="channel-input">
+                </div>
+                <div class="form-group">
+                    <label>Deskripsi</label>
+                    <textarea id="editChannelDesc" rows="3" class="channel-textarea"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="cancelEditChannelBtn">Batal</button>
+                <button class="btn-primary" id="saveEditChannelBtn">Simpan</button>
+            </div>
+        </div>
+    </div>
 
-<!-- Firebase Config -->
-<script src="firebase-config.js"></script>
+    <!-- Voting Modal -->
+    <div class="modal-overlay" id="votingModal" style="display: none;">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 id="votingModalTitle">Buat Voting</h3>
+                <button class="modal-close" id="closeVotingModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Pertanyaan</label>
+                    <input type="text" id="pollQuestion" class="channel-input" placeholder="Apa pertanyaanmu?">
+                </div>
+                <div class="form-group">
+                    <label>Pilihan</label>
+                    <div id="pollOptionsList">
+                        <div class="poll-option-input">
+                            <input type="text" class="poll-option" placeholder="Pilihan 1">
+                        </div>
+                        <div class="poll-option-input">
+                            <input type="text" class="poll-option" placeholder="Pilihan 2">
+                        </div>
+                    </div>
+                    <button class="add-option-btn" id="addPollOptionBtn">+ Tambah Pilihan</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="cancelVotingBtn">Batal</button>
+                <button class="btn-primary" id="createPollSubmitBtn">Buat Voting</button>
+            </div>
+        </div>
+    </div>
 
-<!-- Main Script -->
-<script src="script.js"></script>
+    <!-- View Polls Modal -->
+    <div class="modal-overlay" id="viewPollsModal" style="display: none;">
+        <div class="modal-container modal-large">
+            <div class="modal-header">
+                <h3>Daftar Voting</h3>
+                <button class="modal-close" id="closeViewPollsBtn">&times;</button>
+            </div>
+            <div class="modal-body" id="pollsListContainer">
+                <div class="loading-polls">Memuat voting...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reaction Picker -->
+    <div class="reaction-picker" id="reactionPicker" style="display: none;">
+        <div class="reaction-option" data-reaction="👍">👍</div>
+        <div class="reaction-option" data-reaction="❤️">❤️</div>
+        <div class="reaction-option" data-reaction="😂">😂</div>
+        <div class="reaction-option" data-reaction="😮">😮</div>
+        <div class="reaction-option" data-reaction="😢">😢</div>
+        <div class="reaction-option" data-reaction="🙏">🙏</div>
+    </div>
+
+    <!-- ========== CHAT ROOM (PERSONAL CHAT) ========== -->
+    <div class="chat-room" id="chatRoom" style="display: none;">
+        <div class="chat-room-header">
+            <button id="backToDashboardBtn" class="back-chat-btn">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="chat-room-user">
+                <div class="chat-room-avatar">
+                    <i class="fas fa-user-circle"></i>
+                    <img id="chatAvatarImg" style="display: none; width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                </div>
+                <div>
+                    <h4 id="chatUserName">Loading...</h4>
+                    <small id="chatUserStatus" class="status-text">online</small>
+                </div>
+            </div>
+            <div style="width: 40px;"></div>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="loading-messages"><i class="fas fa-spinner fa-spin"></i> Memuat pesan...</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="messageInput" placeholder="Ketik pesan..." class="chat-input" autocomplete="off">
+            <button id="sendMessageBtn" class="send-btn"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <!-- Firebase Config -->
+    <script src="firebase-config.js"></script>
+
+    <!-- Main Script -->
+    <script src="script.js"></script>
 
 </body>
 </html>

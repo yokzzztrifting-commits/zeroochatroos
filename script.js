@@ -119,6 +119,9 @@ function showNotification(title, message, type = 'success', duration = 4000) {
 function openDashboard(userPhone, userName) {
     currentUserPhone = userPhone;
     
+    // UPDATE SESSION setiap kali buka dashboard (perpanjang masa aktif)
+    saveUserSession(userPhone, userName);
+    
     const registerForm = document.getElementById('registerForm');
     const loginForm = document.getElementById('loginForm');
     const slidesCont = document.querySelector('.slides-container');
@@ -138,7 +141,6 @@ function openDashboard(userPhone, userName) {
     
     loadChats();
     
-    // Load avatar dari Firebase (permanen)
     setTimeout(async () => {
         await loadUserAvatarToDashboard(userPhone);
     }, 500);
@@ -150,40 +152,57 @@ function openDashboard(userPhone, userName) {
     
     // ========== LOAD CHATS ==========
     async function loadChats() {
-        const chatList = document.querySelector('.chat-list');
-        if (!chatList) return;
+    const chatList = document.querySelector('.chat-list');
+    if (!chatList) return;
+    
+    chatList.innerHTML = '<div class="loading-contacts"><i class="fas fa-spinner fa-spin"></i> Memuat chat...</div>';
+    
+    try {
+        const chats = await FirebaseAPI.getChats(currentUserPhone);
         
-        chatList.innerHTML = '<div class="loading-contacts"><i class="fas fa-spinner fa-spin"></i> Memuat chat...</div>';
+        if (!chats || chats.length === 0) {
+            chatList.innerHTML = `<div class="empty-contacts"><i class="fas fa-comments"></i><p>Belum ada chat</p><small>Klik + untuk menambah kontak</small></div>`;
+            return;
+        }
         
-        try {
-            const chats = await FirebaseAPI.getChats(currentUserPhone);
+        chatList.innerHTML = chats.map(chat => `
+            <div class="chat-item" data-phone="${chat.phone}">
+                <div class="chat-avatar-container" style="position: relative; width: 44px; height: 44px;">
+                    <i class="fas fa-user-circle" style="font-size: 44px; color: #aaa; position: absolute; top: 0; left: 0;"></i>
+                    <img class="chat-avatar-img" data-phone="${chat.phone}" src="" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; position: absolute; top: 0; left: 0; display: none;">
+                </div>
+                <div class="chat-info">
+                    <h4>${escapeHtml(chat.name)}</h4>
+                    <p>${chat.lastMessage ? escapeHtml(chat.lastMessage.substring(0, 30)) : 'Mulai chat...'}</p>
+                </div>
+                <div class="contact-status"><span class="status-dot ${chat.status === 'online' ? 'online' : ''}"></span></div>
+                <span class="chat-time">${formatTime(chat.lastMessageTime)}</span>
+            </div>
+        `).join('');
+        
+        // Load avatar untuk setiap kontak
+        document.querySelectorAll('.chat-item').forEach(async (chat) => {
+            const phone = chat.getAttribute('data-phone');
+            const avatarImg = chat.querySelector('.chat-avatar-img');
+            const avatarIcon = chat.querySelector('.fa-user-circle');
             
-            if (!chats || chats.length === 0) {
-                chatList.innerHTML = `<div class="empty-contacts"><i class="fas fa-comments"></i><p>Belum ada chat</p><small>Klik + untuk menambah kontak</small></div>`;
-                return;
+            if (avatarImg && phone) {
+                const avatar = await FirebaseAPI.getUserAvatar(phone);
+                if (avatar && avatar !== 'default' && avatar !== 'null') {
+                    avatarImg.src = avatar;
+                    avatarImg.style.display = 'block';
+                    if (avatarIcon) avatarIcon.style.display = 'none';
+                }
             }
             
-            chatList.innerHTML = chats.map(chat => `
-                <div class="chat-item" data-phone="${chat.phone}">
-                    <i class="fas fa-user-circle"></i>
-                    <div class="chat-info">
-                        <h4>${escapeHtml(chat.name)}</h4>
-                        <p>${chat.lastMessage ? escapeHtml(chat.lastMessage.substring(0, 30)) : 'Mulai chat...'}</p>
-                    </div>
-                    <div class="contact-status"><span class="status-dot ${chat.status === 'online' ? 'online' : ''}"></span></div>
-                    <span class="chat-time">${formatTime(chat.lastMessageTime)}</span>
-                </div>
-            `).join('');
-            
-            document.querySelectorAll('.chat-item').forEach(chat => {
-                chat.addEventListener('click', () => openChat(chat.getAttribute('data-phone')));
-            });
-            
-        } catch (error) {
-            console.error('Error loading chats:', error);
-            chatList.innerHTML = '<div class="empty-contacts"><i class="fas fa-exclamation-circle"></i> Gagal memuat chat</div>';
-        }
+            chat.addEventListener('click', () => openChat(phone));
+        });
+        
+    } catch (error) {
+        console.error('Error loading chats:', error);
+        chatList.innerHTML = '<div class="empty-contacts"><i class="fas fa-exclamation-circle"></i> Gagal memuat chat</div>';
     }
+}
     
     function formatTime(timestamp) {
         if (!timestamp) return '';
@@ -201,58 +220,124 @@ function openDashboard(userPhone, userName) {
     }
     
     // ========== CHAT ROOM ==========
-    let currentChatPhone = null;
     let unsubscribeMessages = null;
     
     function openChat(phone) {
-        currentChatPhone = phone;
-        const contentContainer = document.getElementById('contentContainer');
-        if (contentContainer) contentContainer.style.display = 'none';
+    currentChatPhone = phone;
+    
+    // Sembunyikan dashboard content dan bottom nav
+    const contentContainer = document.getElementById('contentContainer');
+    const bottomNav = document.querySelector('.bottom-nav');
+    const dashboardHeader = document.querySelector('.dashboard-header');
+    
+    if (contentContainer) contentContainer.style.display = 'none';
+    if (bottomNav) bottomNav.style.display = 'none';
+    if (dashboardHeader) dashboardHeader.style.display = 'none';
+    
+    // Create or show chat room
+    let chatRoom = document.getElementById('chatRoom');
+    if (!chatRoom) {
+        chatRoom = document.createElement('div');
+        chatRoom.id = 'chatRoom';
+        chatRoom.className = 'chat-room';
+        if (dashboardApp) dashboardApp.appendChild(chatRoom);
+    }
+    
+    chatRoom.style.display = 'flex';
+    
+    // Reset chat room header
+    const header = chatRoom.querySelector('.chat-room-header');
+    if (header) {
+        const backBtn = header.querySelector('#backToDashboardBtn');
+        if (backBtn) {
+            const newBackBtn = backBtn.cloneNode(true);
+            backBtn.parentNode.replaceChild(newBackBtn, backBtn);
+            newBackBtn.addEventListener('click', closeChat);
+        }
+    }
+    
+    // Load user info (nama dan avatar kontak)
+    FirebaseAPI.getUserByPhone(phone).then(async user => {
+        const chatUserName = document.getElementById('chatUserName');
+        const chatUserStatus = document.getElementById('chatUserStatus');
+        const chatAvatarIcon = document.querySelector('#chatRoom .chat-room-avatar i');
+        const chatAvatarImg = document.getElementById('chatAvatarImg');
         
-        let chatRoom = document.getElementById('chatRoom');
-        if (!chatRoom) {
-            chatRoom = document.createElement('div');
-            chatRoom.id = 'chatRoom';
-            chatRoom.className = 'chat-room';
-            if (dashboardApp) dashboardApp.appendChild(chatRoom);
+        if (chatUserName) chatUserName.textContent = user.name;
+        if (chatUserStatus) {
+            chatUserStatus.textContent = user.status === 'online' ? 'online' : 'offline';
+            chatUserStatus.style.color = user.status === 'online' ? '#4ade80' : '#888';
         }
         
-        chatRoom.style.display = 'flex';
-        chatRoom.innerHTML = `
-            <div class="chat-room-header">
-                <button id="backToDashboardBtn" class="back-chat-btn"><i class="fas fa-arrow-left"></i></button>
-                <div class="chat-room-user"><i class="fas fa-user-circle"></i><div><h4 id="chatUserName">Loading...</h4><small id="chatUserStatus">online</small></div></div>
-            </div>
-            <div class="chat-messages" id="chatMessages"><div class="loading-messages"><i class="fas fa-spinner fa-spin"></i> Memuat pesan...</div></div>
-            <div class="chat-input-area"><input type="text" id="messageInput" placeholder="Ketik pesan..." class="chat-input"><button id="sendMessageBtn" class="send-btn"><i class="fas fa-paper-plane"></i></button></div>
-        `;
-        
-        FirebaseAPI.getUserByPhone(phone).then(user => {
-            const chatUserName = document.getElementById('chatUserName');
-            if (chatUserName) chatUserName.textContent = user.name;
-            updateChatUserStatus(user.status);
-        });
-        
-        loadMessages();
-        
-        if (unsubscribeMessages) unsubscribeMessages();
-        unsubscribeMessages = FirebaseAPI.listenMessages(currentUserPhone, phone, (msgId, message) => {
-            appendMessage(message);
-        });
-        
-        if (statusListeners[phone]) statusListeners[phone]();
-        statusListeners[phone] = FirebaseAPI.listenUserStatus(phone, (status) => {
-            updateChatUserStatus(status);
-        });
-        
-        const backBtn = document.getElementById('backToDashboardBtn');
-        const sendMsgBtn = document.getElementById('sendMessageBtn');
-        const msgInput = document.getElementById('messageInput');
-        
-        if (backBtn) backBtn.addEventListener('click', closeChat);
-        if (sendMsgBtn) sendMsgBtn.addEventListener('click', sendMessage);
-        if (msgInput) msgInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+        // Load avatar kontak
+        const avatar = await FirebaseAPI.getUserAvatar(phone);
+        if (avatar && avatar !== 'default' && avatar !== 'null') {
+            if (chatAvatarImg) {
+                chatAvatarImg.src = avatar;
+                chatAvatarImg.style.display = 'block';
+            }
+            if (chatAvatarIcon) chatAvatarIcon.style.display = 'none';
+        } else {
+            if (chatAvatarImg) chatAvatarImg.style.display = 'none';
+            if (chatAvatarIcon) chatAvatarIcon.style.display = 'block';
+        }
+    });
+    
+    // Load messages
+    loadMessages();
+    
+    // Listen for new messages
+    if (unsubscribeMessages) unsubscribeMessages();
+    unsubscribeMessages = FirebaseAPI.listenMessages(currentUserPhone, phone, (msgId, message) => {
+        appendMessage(message);
+    });
+    
+    // Listen user status
+    if (statusListeners[phone]) statusListeners[phone]();
+    statusListeners[phone] = FirebaseAPI.listenUserStatus(phone, (status) => {
+        const chatUserStatus = document.getElementById('chatUserStatus');
+        if (chatUserStatus) {
+            chatUserStatus.textContent = status === 'online' ? 'online' : 'offline';
+            chatUserStatus.style.color = status === 'online' ? '#4ade80' : '#888';
+        }
+    });
+    
+    // Re-attach send button
+    const sendBtn = document.getElementById('sendMessageBtn');
+    const msgInput = document.getElementById('messageInput');
+    
+    if (sendBtn) {
+        const newSendBtn = sendBtn.cloneNode(true);
+        sendBtn.parentNode.replaceChild(newSendBtn, sendBtn);
+        newSendBtn.addEventListener('click', sendMessage);
     }
+    
+    if (msgInput) {
+        const newMsgInput = msgInput.cloneNode(true);
+        msgInput.parentNode.replaceChild(newMsgInput, msgInput);
+        newMsgInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    }
+}
+
+function closeChat() {
+    if (unsubscribeMessages) unsubscribeMessages();
+    
+    // Tampilkan kembali dashboard content dan bottom nav
+    const contentContainer = document.getElementById('contentContainer');
+    const bottomNav = document.querySelector('.bottom-nav');
+    const dashboardHeader = document.querySelector('.dashboard-header');
+    const chatRoom = document.getElementById('chatRoom');
+    
+    if (contentContainer) contentContainer.style.display = 'block';
+    if (bottomNav) bottomNav.style.display = 'flex';
+    if (dashboardHeader) dashboardHeader.style.display = 'flex';
+    if (chatRoom) chatRoom.style.display = 'none';
+    
+    currentChatPhone = null;
+    loadChats();
+}
     
     function updateChatUserStatus(status) {
         const statusEl = document.getElementById('chatUserStatus');
@@ -262,34 +347,107 @@ function openDashboard(userPhone, userName) {
         }
     }
     
-    async function loadMessages() {
-        const messagesDiv = document.getElementById('chatMessages');
-        if (!messagesDiv) return;
-        messagesDiv.innerHTML = '<div class="loading-messages"><i class="fas fa-spinner fa-spin"></i> Memuat pesan...</div>';
-        
-        try {
-            const messages = await FirebaseAPI.getMessages(currentUserPhone, currentChatPhone);
-            messagesDiv.innerHTML = '';
-            if (messages && messages.length) {
-                messages.forEach(msg => appendMessage(msg));
-            }
-            scrollToBottom();
-        } catch (error) {
-            messagesDiv.innerHTML = '<div class="empty-messages">Gagal memuat pesan</div>';
-        }
+    // ========== LOAD CHATS (LIST KONTAK YANG SUDAH DIADD) ==========
+async function loadChats() {
+    const chatList = document.querySelector('.chat-list');
+    if (!chatList) {
+        console.log('chat-list element not found!');
+        return;
     }
     
-    function appendMessage(message) {
-        const messagesDiv = document.getElementById('chatMessages');
-        if (!messagesDiv) return;
+    chatList.innerHTML = '<div class="loading-contacts"><i class="fas fa-spinner fa-spin"></i> Memuat kontak...</div>';
+    
+    try {
+        // Ambil daftar kontak yang sudah ditambahkan
+        const contacts = await FirebaseAPI.getContacts(currentUserPhone);
+        console.log('Contacts loaded:', contacts);
         
-        const isOwn = message.sender === currentUserPhone;
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${isOwn ? 'own' : 'other'}`;
-        messageDiv.innerHTML = `<div class="message-bubble"><p>${escapeHtml(message.message)}</p><span class="message-time">${formatTimeShort(message.timestamp)}</span>${isOwn ? `<i class="fas fa-check-double ${message.read ? 'read' : ''}"></i>` : ''}</div>`;
-        messagesDiv.appendChild(messageDiv);
-        scrollToBottom();
+        if (!contacts || contacts.length === 0) {
+            chatList.innerHTML = `
+                <div class="empty-contacts" style="text-align: center; padding: 40px;">
+                    <i class="fas fa-users" style="font-size: 48px; margin-bottom: 16px; display: block; color: #666;"></i>
+                    <p style="color: #888; margin-bottom: 8px;">Belum ada kontak</p>
+                    <small style="color: #666;">Klik + untuk menambah kontak</small>
+                </div>
+            `;
+            return;
+        }
+        
+        // Tampilkan list kontak
+        chatList.innerHTML = contacts.map(contact => `
+            <div class="chat-item" data-phone="${contact.phone}" style="display: flex; align-items: center; gap: 14px; padding: 14px; background: #2a2a2a; border-radius: 16px; margin-bottom: 10px; cursor: pointer;">
+                <div style="position: relative; width: 48px; height: 48px;">
+                    <i class="fas fa-user-circle" style="font-size: 48px; color: #aaa; position: absolute; top: 0; left: 0;"></i>
+                    <img class="chat-avatar-img" data-phone="${contact.phone}" src="" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; position: absolute; top: 0; left: 0; display: none;">
+                </div>
+                <div style="flex: 1;">
+                    <h4 style="color: white; font-size: 16px; margin-bottom: 4px;">${escapeHtml(contact.name)}</h4>
+                    <p style="color: #888; font-size: 13px;">${contact.phone}</p>
+                </div>
+                <div class="contact-status">
+                    <span class="status-dot ${contact.status === 'online' ? 'online' : ''}" style="width: 10px; height: 10px; border-radius: 50%; display: inline-block; background: ${contact.status === 'online' ? '#4ade80' : '#666'};"></span>
+                    <span style="font-size: 11px; color: #888;">${contact.status === 'online' ? 'Online' : 'Offline'}</span>
+                </div>
+            </div>
+        `).join('');
+        
+        // Load avatar untuk setiap kontak
+        for (const contact of contacts) {
+            const avatarImg = document.querySelector(`.chat-avatar-img[data-phone="${contact.phone}"]`);
+            if (avatarImg) {
+                const avatar = await FirebaseAPI.getUserAvatar(contact.phone);
+                if (avatar && avatar !== 'default' && avatar !== 'null') {
+                    avatarImg.src = avatar;
+                    avatarImg.style.display = 'block';
+                    const iconElem = avatarImg.parentElement.querySelector('.fa-user-circle');
+                    if (iconElem) iconElem.style.display = 'none';
+                }
+            }
+        }
+        
+        // Event click untuk buka chat
+        document.querySelectorAll('.chat-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const phone = item.getAttribute('data-phone');
+                console.log('Opening chat with:', phone);
+                openChat(phone);
+            });
+        });
+        
+    } catch (error) {
+        console.error('Error loading chats:', error);
+        chatList.innerHTML = '<div class="empty-contacts"><i class="fas fa-exclamation-circle"></i> Gagal memuat kontak</div>';
     }
+}
+    
+    function appendMessage(message) {
+    const messagesDiv = document.getElementById('chatMessages');
+    if (!messagesDiv) return;
+    
+    const isOwn = message.sender === currentUserPhone;
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${isOwn ? 'own' : 'other'}`;
+    
+    // Cegah double message
+    if (messageDiv.getAttribute('data-message-id') === message.id) return;
+    messageDiv.setAttribute('data-message-id', message.id);
+    
+    const time = new Date(message.timestamp);
+    const timeStr = time.getHours().toString().padStart(2, '0') + ':' + time.getMinutes().toString().padStart(2, '0');
+    
+    messageDiv.innerHTML = `
+        <div class="message-bubble">
+            <p style="margin: 0; word-wrap: break-word;">${escapeHtml(message.message)}</p>
+            <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 4px;">
+                <span class="message-time">${timeStr}</span>
+                ${isOwn ? `<i class="fas fa-check-double ${message.read ? 'read' : ''}"></i>` : ''}
+            </div>
+        </div>
+    `;
+    
+    messagesDiv.appendChild(messageDiv);
+    scrollToBottom();
+}
     
     function scrollToBottom() {
         const messagesDiv = document.getElementById('chatMessages');
@@ -307,16 +465,6 @@ function openDashboard(userPhone, userName) {
             showNotification('Gagal', 'Pesan tidak terkirim', 'error', 2000);
             if (input) input.value = message;
         }
-    }
-    
-    function closeChat() {
-        if (unsubscribeMessages) unsubscribeMessages();
-        const contentContainer = document.getElementById('contentContainer');
-        if (contentContainer) contentContainer.style.display = 'block';
-        const chatRoom = document.getElementById('chatRoom');
-        if (chatRoom) chatRoom.style.display = 'none';
-        currentChatPhone = null;
-        loadChats();
     }
     
     function escapeHtml(text) {
@@ -375,15 +523,15 @@ function openDashboard(userPhone, userName) {
     }
     
     async function addContact(phone) {
-        try {
-            await FirebaseAPI.addContact(currentUserPhone, phone);
-            await loadUsersForContact();
-            showNotification('Berhasil!', 'Kontak berhasil ditambahkan', 'success', 2000);
-            loadChats();
-        } catch (error) {
-            showNotification('Gagal', error.message, 'error', 2000);
-        }
+    try {
+        await FirebaseAPI.addContact(currentUserPhone, phone);
+        await loadUsersForContact(); // refresh modal
+        showNotification('Berhasil!', 'Kontak berhasil ditambahkan', 'success', 2000);
+        loadChats(); // refresh chat list di dashboard
+    } catch (error) {
+        showNotification('Gagal', error.message, 'error', 2000);
     }
+}
     
     // ========== REGISTER & LOGIN ==========
     const registerFormBtn = document.getElementById('registerBtn');
@@ -481,21 +629,26 @@ function openDashboard(userPhone, userName) {
         });
     }
     
-    const verifyOtpReg = document.getElementById('verifyOtpReg');
-    if (verifyOtpReg) {
-        verifyOtpReg.addEventListener('click', async () => {
-            let inputOTP = '';
-            document.querySelectorAll('#regStep2 .otp-field').forEach(f => { if (f) inputOTP += f.value; });
-            if (inputOTP === regOTP) {
-                const phoneInput = document.getElementById('regPhone');
-                const phone = phoneInput ? phoneInput.value.trim() : '';
-                const userName = 'User_' + phone.substring(phone.length - 4);
-                await FirebaseAPI.registerUser(phone, userName);
-                showNotification('Berhasil!', 'Akun berhasil dibuat', 'success', 2000);
-                openDashboard(phone, userName);
-            } else { showNotification('Gagal', 'Kode OTP salah', 'error', 2000); }
-        });
+    const verifyOtpReg = document.getElementById('verifyOtpReg').addEventListener('click', async () => {
+    let inputOTP = '';
+    document.querySelectorAll('#regStep2 .otp-field').forEach(f => { if (f) inputOTP += f.value; });
+    
+    if (inputOTP === regOTP) {
+        const phoneInput = document.getElementById('regPhone');
+        const phone = phoneInput ? phoneInput.value.trim() : '';
+        const userName = 'User_' + phone.substring(phone.length - 4);
+        
+        await FirebaseAPI.registerUser(phone, userName);
+        
+        // SIMPAN SESSION
+        saveUserSession(phone, userName);
+        
+        showNotification('Berhasil!', 'Akun berhasil dibuat', 'success', 2000);
+        openDashboard(phone, userName);
+    } else { 
+        showNotification('Gagal', 'Kode OTP salah', 'error', 2000); 
     }
+});
     
     const resendOtp = document.getElementById('resendOtp');
     if (resendOtp) {
@@ -539,20 +692,24 @@ function openDashboard(userPhone, userName) {
         });
     }
     
-    const verifyOtpLogin = document.getElementById('verifyOtpLogin');
-    if (verifyOtpLogin) {
-        verifyOtpLogin.addEventListener('click', async () => {
-            let inputOTP = '';
-            document.querySelectorAll('#loginStep2 .otp-field-login').forEach(f => { if (f) inputOTP += f.value; });
-            if (inputOTP === loginOTP) {
-                const phoneInput = document.getElementById('loginPhone');
-                const phone = phoneInput ? phoneInput.value.trim() : '';
-                const userData = await FirebaseAPI.loginUser(phone);
-                showNotification('Berhasil!', 'Selamat datang kembali', 'success', 2000);
-                openDashboard(phone, userData.name);
-            } else { showNotification('Gagal', 'Kode OTP salah', 'error', 2000); }
-        });
+    const verifyOtpLogin = document.getElementById('verifyOtpLogin').addEventListener('click', async () => {
+    let inputOTP = '';
+    document.querySelectorAll('#loginStep2 .otp-field-login').forEach(f => { if (f) inputOTP += f.value; });
+    
+    if (inputOTP === loginOTP) {
+        const phoneInput = document.getElementById('loginPhone');
+        const phone = phoneInput ? phoneInput.value.trim() : '';
+        const userData = await FirebaseAPI.loginUser(phone);
+        
+        // SIMPAN SESSION
+        saveUserSession(phone, userData.name, userData.avatar);
+        
+        showNotification('Berhasil!', 'Selamat datang kembali', 'success', 2000);
+        openDashboard(phone, userData.name);
+    } else { 
+        showNotification('Gagal', 'Kode OTP salah', 'error', 2000); 
     }
+});
     
     const resendOtpLogin = document.getElementById('resendOtpLogin');
     if (resendOtpLogin) {
@@ -679,17 +836,22 @@ function openDashboard(userPhone, userName) {
     
     let currentProfileUser = null, avatarChanged = false, avatarBase64 = null;
     
-    if (userInfoBtn) {
-        userInfoBtn.addEventListener('click', async () => {
-            const savedUser = localStorage.getItem('zeroo_user');
-            if (savedUser) {
-                const userData = JSON.parse(savedUser);
-                currentProfileUser = userData.phone;
-                await loadProfileData();
-                if (profileScreen) profileScreen.style.display = 'flex';
-            }
-        });
-    }
+if (userInfoBtn) {
+    userInfoBtn.addEventListener('click', async () => {
+        console.log('Profile button clicked');
+        const savedUser = localStorage.getItem('zeroo_user');
+        if (savedUser) {
+            const userData = JSON.parse(savedUser);
+            currentProfileUser = userData.phone;
+            await loadProfileData();
+            if (profileScreen) profileScreen.style.display = 'flex';
+        } else {
+            console.log('No saved user found');
+        }
+    });
+} else {
+    console.log('userInfoBtn not found!');
+}
     
 // Load profile data - FIX
 async function loadProfileData() {
@@ -808,42 +970,63 @@ if (profileSaveBtn) {
         });
     }
     
-    if (logoutOption) {
-        logoutOption.addEventListener('click', async () => {
-            if (profileScreen) profileScreen.style.display = 'none';
-            if (confirm('Yakin ingin keluar?')) {
-                if (currentUserPhone) {
-                    await FirebaseAPI.updateUserStatus(currentUserPhone, 'offline');
-                    await FirebaseAPI.logActivity(currentUserPhone, 'logout', {});
-                }
-                if (dashboardApp) dashboardApp.style.display = 'none';
-                const slidesCont = document.querySelector('.slides-container');
-                const pagination = document.querySelector('.pagination');
-                if (slidesCont) slidesCont.style.display = 'flex';
-                if (pagination) pagination.style.display = 'flex';
-                currentUserPhone = null;
-                showNotification('Berhasil Keluar', 'Sampai jumpa lagi! 👋', 'info', 3000);
-            }
-        });
+    // Logout function
+async function handleLogout() {
+    if (confirm('Yakin ingin keluar?')) {
+        if (currentUserPhone) {
+            await FirebaseAPI.updateUserStatus(currentUserPhone, 'offline');
+            await FirebaseAPI.logActivity(currentUserPhone, 'logout', {});
+        }
+        
+        // HAPUS SESSION
+        clearUserSession();
+        
+        if (dashboardApp) dashboardApp.style.display = 'none';
+        const slidesCont = document.querySelector('.slides-container');
+        const pagination = document.querySelector('.pagination');
+        if (slidesCont) slidesCont.style.display = 'flex';
+        if (pagination) pagination.style.display = 'flex';
+        currentUserPhone = null;
+        showNotification('Berhasil Keluar', 'Sampai jumpa lagi! 👋', 'info', 3000);
     }
+}
     
 // Load avatar ke dashboard saat login - FIX (ambil dari Firebase)
 async function loadUserAvatarToDashboard(phone) {
     try {
         const avatar = await FirebaseAPI.getUserAvatar(phone);
-        if (avatar && avatar !== 'default' && avatar !== 'null') {
-            if (userAvatarImg) {
-                userAvatarImg.src = avatar;
-                userAvatarImg.style.display = 'block';
+        const userAvatarImgElem = document.getElementById('userAvatarImg');
+        const userAvatarIconElem = document.querySelector('#userAvatar i');
+        
+        if (avatar && avatar !== 'default' && avatar !== 'null' && avatar !== '') {
+            if (userAvatarImgElem) {
+                userAvatarImgElem.src = avatar;
+                userAvatarImgElem.style.display = 'block';
             }
-            if (userAvatarIcon) userAvatarIcon.style.display = 'none';
-            console.log('Avatar loaded from Firebase');
+            if (userAvatarIconElem) userAvatarIconElem.style.display = 'none';
+            console.log('Avatar loaded from Firebase for:', phone);
         } else {
-            if (userAvatarImg) userAvatarImg.style.display = 'none';
-            if (userAvatarIcon) userAvatarIcon.style.display = 'flex';
+            if (userAvatarImgElem) userAvatarImgElem.style.display = 'none';
+            if (userAvatarIconElem) userAvatarIconElem.style.display = 'flex';
         }
     } catch (error) {
         console.error('Error loading avatar:', error);
+    }
+}
+
+// Load avatar untuk kontak di chat list
+async function loadContactAvatar(phone, imgElement, iconElement) {
+    try {
+        const avatar = await FirebaseAPI.getUserAvatar(phone);
+        if (avatar && avatar !== 'default' && avatar !== 'null' && avatar !== '') {
+            if (imgElement) {
+                imgElement.src = avatar;
+                imgElement.style.display = 'block';
+            }
+            if (iconElement) iconElement.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Error loading contact avatar:', error);
     }
 }
     
@@ -1227,5 +1410,333 @@ async function loadUserAvatarToDashboard(phone) {
             } catch (error) { showNotification('Gagal', error.message, 'error', 2000); }
         });
     }
+    
+   // ========== SESSION MANAGEMENT ==========
+// Simpan session saat login/register berhasil
+function saveUserSession(phone, name, avatar = null) {
+    const sessionData = {
+        phone: phone,
+        name: name,
+        avatar: avatar,
+        loginTime: new Date().toISOString(),
+        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 hari
+    };
+    localStorage.setItem('zeroo_session', JSON.stringify(sessionData));
+    localStorage.setItem('zeroo_user', JSON.stringify({
+        phone: phone,
+        name: name,
+        verified: true,
+        date: new Date().toISOString()
+    }));
+}
+
+// Cek session saat load
+async function checkExistingSession() {
+    const session = localStorage.getItem('zeroo_session');
+    if (!session) return false;
+    
+    try {
+        const sessionData = JSON.parse(session);
+        // Cek apakah session expired
+        if (new Date(sessionData.expiresAt) < new Date()) {
+            // Session expired, hapus
+            localStorage.removeItem('zeroo_session');
+            localStorage.removeItem('zeroo_user');
+            return false;
+        }
+        
+        // Cek apakah user masih terdaftar di Firebase
+        const exists = await FirebaseAPI.isUserRegistered(sessionData.phone);
+        if (!exists) {
+            localStorage.removeItem('zeroo_session');
+            localStorage.removeItem('zeroo_user');
+            return false;
+        }
+        
+        // Session valid, langsung login
+        const userData = await FirebaseAPI.getUserByPhone(sessionData.phone);
+        await FirebaseAPI.loginUser(sessionData.phone);
+        openDashboard(sessionData.phone, userData.name);
+        return true;
+    } catch (error) {
+        console.error('Session check error:', error);
+        return false;
+    }
+}
+
+// Hapus session saat logout
+function clearUserSession() {
+    localStorage.removeItem('zeroo_session');
+    localStorage.removeItem('zeroo_user');
+    localStorage.removeItem('zeroo_contacts');
+}
+
+// Logout dari profile
+if (logoutOption) {
+    logoutOption.addEventListener('click', async () => {
+        if (profileScreen) profileScreen.style.display = 'none';
+        if (confirm('Yakin ingin keluar?')) {
+            if (currentUserPhone) {
+                await FirebaseAPI.updateUserStatus(currentUserPhone, 'offline');
+                await FirebaseAPI.logActivity(currentUserPhone, 'logout', {});
+            }
+            
+            // HAPUS SESSION
+            clearUserSession();
+            
+            if (dashboardApp) dashboardApp.style.display = 'none';
+            const slidesCont = document.querySelector('.slides-container');
+            const pagination = document.querySelector('.pagination');
+            if (slidesCont) slidesCont.style.display = 'flex';
+            if (pagination) pagination.style.display = 'flex';
+            currentUserPhone = null;
+            showNotification('Berhasil Keluar', 'Sampai jumpa lagi! 👋', 'info', 3000);
+        }
+    });
+}
+
+// ========== CHAT FUNCTIONS ==========
+let currentChatPhone = null;
+
+// Fungsi untuk memuat pesan
+async function loadMessages() {
+    const messagesDiv = document.getElementById('chatMessages');
+    if (!messagesDiv) {
+        console.error('chatMessages element not found');
+        return;
+    }
+    
+    messagesDiv.innerHTML = '<div class="loading-messages"><i class="fas fa-spinner fa-spin"></i> Memuat pesan...</div>';
+    
+    try {
+        const messages = await FirebaseAPI.getMessages(currentUserPhone, currentChatPhone);
+        messagesDiv.innerHTML = '';
+        
+        if (!messages || messages.length === 0) {
+            messagesDiv.innerHTML = '<div class="empty-messages">Belum ada pesan. Mulai chatting sekarang!</div>';
+            return;
+        }
+        
+        // Urutkan berdasarkan timestamp
+        const sortedMessages = [...messages].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        
+        sortedMessages.forEach(msg => {
+            const isOwn = msg.sender === currentUserPhone;
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${isOwn ? 'own' : 'other'}`;
+            msgDiv.setAttribute('data-message-id', msg.id);
+            
+            const time = new Date(msg.timestamp);
+            const timeStr = time.getHours().toString().padStart(2, '0') + ':' + time.getMinutes().toString().padStart(2, '0');
+            
+            msgDiv.innerHTML = `
+                <div class="message-bubble">
+                    <p style="margin: 0; word-wrap: break-word;">${escapeHtml(msg.message)}</p>
+                    <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 4px;">
+                        <span class="message-time">${timeStr}</span>
+                        ${isOwn ? `<i class="fas fa-check-double ${msg.read ? 'read' : ''}"></i>` : ''}
+                    </div>
+                </div>
+            `;
+            
+            messagesDiv.appendChild(msgDiv);
+        });
+        
+        scrollToBottom();
+        
+    } catch (error) {
+        console.error('Error loading messages:', error);
+        messagesDiv.innerHTML = '<div class="empty-messages">Gagal memuat pesan</div>';
+    }
+}
+
+// Fungsi untuk menampilkan pesan baru
+function appendMessage(message) {
+    const messagesDiv = document.getElementById('chatMessages');
+    if (!messagesDiv) return;
+    
+    // Cek double message
+    if (messagesDiv.querySelector(`.message[data-message-id="${message.id}"]`)) return;
+    
+    const isOwn = message.sender === currentUserPhone;
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `message ${isOwn ? 'own' : 'other'}`;
+    msgDiv.setAttribute('data-message-id', message.id);
+    
+    const time = new Date(message.timestamp);
+    const timeStr = time.getHours().toString().padStart(2, '0') + ':' + time.getMinutes().toString().padStart(2, '0');
+    
+    msgDiv.innerHTML = `
+        <div class="message-bubble">
+            <p style="margin: 0; word-wrap: break-word;">${escapeHtml(message.message)}</p>
+            <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 4px;">
+                <span class="message-time">${timeStr}</span>
+                ${isOwn ? `<i class="fas fa-check-double ${message.read ? 'read' : ''}"></i>` : ''}
+            </div>
+        </div>
+    `;
+    
+    messagesDiv.appendChild(msgDiv);
+    scrollToBottom();
+}
+
+// Fungsi untuk scroll ke bawah
+function scrollToBottom() {
+    const messagesDiv = document.getElementById('chatMessages');
+    if (messagesDiv) {
+        setTimeout(() => {
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }, 100);
+    }
+}
+
+// Fungsi untuk mengirim pesan
+async function sendMessage() {
+    const input = document.getElementById('messageInput');
+    const message = input ? input.value.trim() : '';
+    if (!message) return;
+    
+    if (input) input.value = '';
+    
+    try {
+        await FirebaseAPI.sendMessage(currentUserPhone, currentChatPhone, message);
+        // Pesan akan muncul via listener
+    } catch (error) {
+        console.error('Error sending message:', error);
+        showNotification('Gagal', 'Pesan tidak terkirim', 'error', 2000);
+        if (input) input.value = message;
+    }
+}
+
+// Fungsi untuk membuka chat
+function openChat(phone) {
+    console.log('Opening chat with:', phone);
+    currentChatPhone = phone;
+    
+    // Sembunyikan dashboard content dan bottom nav
+    const contentContainer = document.getElementById('contentContainer');
+    const bottomNav = document.querySelector('.bottom-nav');
+    const dashboardHeader = document.querySelector('.dashboard-header');
+    
+    if (contentContainer) contentContainer.style.display = 'none';
+    if (bottomNav) bottomNav.style.display = 'none';
+    if (dashboardHeader) dashboardHeader.style.display = 'none';
+    
+    // Tampilkan chat room
+    const chatRoom = document.getElementById('chatRoom');
+    if (chatRoom) {
+        chatRoom.style.display = 'flex';
+    } else {
+        console.error('Chat room element not found!');
+        return;
+    }
+    
+    // Reset chat messages
+    const messagesDiv = document.getElementById('chatMessages');
+    if (messagesDiv) {
+        messagesDiv.innerHTML = '<div class="loading-messages"><i class="fas fa-spinner fa-spin"></i> Memuat pesan...</div>';
+    }
+    
+    // Load user info (nama dan avatar kontak)
+    FirebaseAPI.getUserByPhone(phone).then(async user => {
+        const chatUserName = document.getElementById('chatUserName');
+        const chatUserStatus = document.getElementById('chatUserStatus');
+        const chatAvatarIcon = document.querySelector('#chatRoom .chat-room-avatar i');
+        const chatAvatarImg = document.getElementById('chatAvatarImg');
+        
+        if (chatUserName) chatUserName.textContent = user.name || 'User';
+        if (chatUserStatus) {
+            chatUserStatus.textContent = user.status === 'online' ? 'online' : 'offline';
+            chatUserStatus.style.color = user.status === 'online' ? '#4ade80' : '#888';
+        }
+        
+        // Load avatar kontak
+        try {
+            const avatar = await FirebaseAPI.getUserAvatar(phone);
+            if (avatar && avatar !== 'default' && avatar !== 'null') {
+                if (chatAvatarImg) {
+                    chatAvatarImg.src = avatar;
+                    chatAvatarImg.style.display = 'block';
+                }
+                if (chatAvatarIcon) chatAvatarIcon.style.display = 'none';
+            } else {
+                if (chatAvatarImg) chatAvatarImg.style.display = 'none';
+                if (chatAvatarIcon) chatAvatarIcon.style.display = 'block';
+            }
+        } catch(e) {
+            console.log('Avatar load error:', e);
+        }
+    }).catch(err => {
+        console.error('Error loading user:', err);
+    });
+    
+    // Load messages
+    loadMessages();
+    
+    // Listen for new messages
+    if (unsubscribeMessages) unsubscribeMessages();
+    unsubscribeMessages = FirebaseAPI.listenMessages(currentUserPhone, phone, (msgId, message) => {
+        appendMessage(message);
+    });
+    
+    // Listen user status
+    if (statusListeners[phone]) statusListeners[phone]();
+    statusListeners[phone] = FirebaseAPI.listenUserStatus(phone, (status) => {
+        const chatUserStatus = document.getElementById('chatUserStatus');
+        if (chatUserStatus) {
+            chatUserStatus.textContent = status === 'online' ? 'online' : 'offline';
+            chatUserStatus.style.color = status === 'online' ? '#4ade80' : '#888';
+        }
+    });
+    
+    // Back button event
+    const backBtn = document.getElementById('backToDashboardBtn');
+    if (backBtn) {
+        const newBackBtn = backBtn.cloneNode(true);
+        backBtn.parentNode.replaceChild(newBackBtn, backBtn);
+        newBackBtn.addEventListener('click', closeChat);
+    }
+    
+    // Send button event
+    const sendBtn = document.getElementById('sendMessageBtn');
+    if (sendBtn) {
+        const newSendBtn = sendBtn.cloneNode(true);
+        sendBtn.parentNode.replaceChild(newSendBtn, sendBtn);
+        newSendBtn.addEventListener('click', sendMessage);
+    }
+    
+    // Message input event
+    const msgInput = document.getElementById('messageInput');
+    if (msgInput) {
+        const newMsgInput = msgInput.cloneNode(true);
+        msgInput.parentNode.replaceChild(newMsgInput, msgInput);
+        newMsgInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        newMsgInput.focus();
+    }
+}
+
+// Fungsi untuk menutup chat
+function closeChat() {
+    if (unsubscribeMessages) unsubscribeMessages();
+    
+    // Tampilkan kembali dashboard content dan bottom nav
+    const contentContainer = document.getElementById('contentContainer');
+    const bottomNav = document.querySelector('.bottom-nav');
+    const dashboardHeader = document.querySelector('.dashboard-header');
+    const chatRoom = document.getElementById('chatRoom');
+    
+    if (contentContainer) contentContainer.style.display = 'block';
+    if (bottomNav) bottomNav.style.display = 'flex';
+    if (dashboardHeader) dashboardHeader.style.display = 'flex';
+    if (chatRoom) chatRoom.style.display = 'none';
+    
+    currentChatPhone = null;
+    loadChats();
+}
     
 }); // AKHIR DOMContentLoaded
