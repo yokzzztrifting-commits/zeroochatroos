@@ -276,30 +276,30 @@
             </div>
         </div>
     </div>
-
-    <!-- Modal Tambah Kontak -->
-    <div class="modal-overlay" id="contactModal" style="display: none;">
-        <div class="modal-container">
-            <div class="modal-header">
-                <h3><i class="fas fa-user-plus"></i> Tambah Kontak</h3>
-                <button class="modal-close" id="closeModalBtn">&times;</button>
+    
+<!-- Modal Tambah Kontak -->
+<div class="modal-overlay" id="contactModal" style="display: none;">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3><i class="fas fa-user-plus"></i> Tambah Kontak</h3>
+            <button class="modal-close" id="closeModalBtn">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="search-contact">
+                <input type="text" id="searchContactInput" placeholder="Cari nomor WhatsApp...">
+                <i class="fas fa-search"></i>
             </div>
-            <div class="modal-body">
-                <div class="search-contact">
-                    <input type="text" id="searchContactInput" placeholder="Cari nomor WhatsApp...">
-                    <i class="fas fa-search"></i>
+            <div class="contact-list" id="contactList">
+                <div class="loading-contacts">
+                    <i class="fas fa-spinner fa-spin"></i> Memuat daftar user...
                 </div>
-                <div class="contact-list" id="contactList">
-                    <div class="loading-contacts">
-                        <i class="fas fa-spinner fa-spin"></i> Memuat daftar user...
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-cancel" id="cancelModalBtn">Batal</button>
             </div>
         </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" id="cancelModalBtn">Tutup</button>
+        </div>
     </div>
+</div>
 
     <!-- PROFILE SETTINGS SCREEN -->
     <div class="profile-screen" id="profileScreen" style="display: none;">
@@ -430,7 +430,7 @@
             <div class="loading-messages"><i class="fas fa-spinner fa-spin"></i> Memuat pesan...</div>
         </div>
         
-        <div class="channel-input-area" id="channelInputArea">
+        <div class="chat-input-area" id="channelInputArea">
             <div class="input-container">
                 <div class="media-buttons">
                     <button class="media-btn" id="channelImageBtn">
@@ -557,6 +557,79 @@
             <button id="sendMessageBtn" class="send-btn"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
+    
+<!-- CHANNEL INFO SCREEN - MODERN VERSION -->
+<div class="channel-info-screen" id="channelInfoScreen" style="display: none;">
+    <div class="channel-info-header">
+        <button class="channel-info-back-btn" id="channelInfoBackBtn">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h3>Info Channel</h3>
+        <div style="width: 40px;"></div>
+    </div>
+    
+    <div class="channel-info-content">
+        <!-- Hero Section -->
+        <div class="channel-info-hero">
+            <div class="channel-info-avatar" id="channelInfoAvatarWrapper">
+                <img id="channelInfoAvatar" src="" alt="Channel Avatar">
+            </div>
+            <h2 class="channel-info-name" id="channelInfoName">Channel Name</h2>
+            <div class="channel-info-username">channel</div>
+        </div>
+        
+        <!-- Stats -->
+        <div class="channel-info-stats">
+            <div class="stat-item">
+                <span>Member</span>
+                <strong id="channelInfoMembers">0</strong>
+            </div>
+            <div class="stat-item">
+                <span>Total Pesan</span>
+                <strong id="channelInfoMessages">0</strong>
+            </div>
+        </div>
+        
+        <!-- Info Cards -->
+        <div class="channel-info-cards">
+            <div class="info-card">
+                <div class="info-card-header">
+                    <i class="fas fa-align-left"></i>
+                    <span>Deskripsi</span>
+                </div>
+                <div class="info-card-content" id="channelInfoDesc">-</div>
+            </div>
+            
+            <div class="info-card">
+                <div class="info-card-header">
+                    <i class="fas fa-crown"></i>
+                    <span>Pemilik Channel</span>
+                </div>
+                <div class="info-card-content" id="channelInfoOwner">-</div>
+            </div>
+        </div>
+        
+        <!-- 3 Action Buttons -->
+        <div class="channel-action-buttons" id="channelActionButtons">
+            <button class="action-btn clear-chat-btn" id="clearChatChannelBtn">
+                <i class="fas fa-trash-alt"></i>
+                <span>Hapus Pesan</span>
+            </button>
+            <button class="action-btn report-channel-btn" id="reportChannelBtn">
+                <i class="fas fa-flag"></i>
+                <span>Laporkan</span>
+            </button>
+            <button class="action-btn delete-channel-btn" id="deleteChannelBtn">
+                <i class="fas fa-trash"></i>
+                <span>Hapus Channel</span>
+            </button>
+        </div>
+        
+        <div class="channel-info-footer">
+            <i class="fas fa-calendar-alt"></i> Dibuat pada <span id="channelInfoCreatedAt">-</span>
+        </div>
+    </div>
+</div>
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>

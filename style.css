@@ -725,36 +725,142 @@ body {
 .search-contact input:focus { box-shadow: 0 0 0 2px rgba(74,222,128,0.3); }
 .search-contact i { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #666; }
 
-.contact-list { display: flex; flex-direction: column; gap: 10px; }
+/* Contact List - Modal */
+.contact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+}
 
 .contact-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px;
-    background: #353535;
-    transition: all 0.3s ease;
+    padding: 12px;
+    background: #2a2a2a;
+    border-radius: 14px;
+    transition: all 0.2s;
 }
 
 .contact-item:hover {
-    background: #404040;
+    background: #353535;
     transform: translateX(4px);
 }
 
-.contact-info { display: flex; align-items: center; gap: 12px; }
+.contact-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+}
+
 .contact-avatar {
-    width: 44px; height: 44px;
-    background: #2a2a2a;
+    position: relative;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
+    background: #353535;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
+    overflow: hidden;
 }
-.contact-item:hover .contact-avatar { transform: scale(1.05); }
-.contact-details h4 { color: #fff; font-size: 15px; }
-.contact-details p { color: #888; font-size: 12px; }
-.contact-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #666; }
+
+.contact-avatar i {
+    font-size: 32px;
+    color: #888;
+}
+
+.contact-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.contact-details {
+    flex: 1;
+}
+
+.contact-details h4 {
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.contact-details p {
+    color: #888;
+    font-size: 12px;
+}
+
+.contact-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #888;
+    margin-right: 12px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #666;
+}
+
+.status-dot.online {
+    background: #4ade80;
+    box-shadow: 0 0 4px #4ade80;
+}
+
+/* Action Buttons di Contact List */
+.contact-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.add-contact-btn, .remove-contact-btn {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.add-contact-btn {
+    background: #4ade80;
+    color: #1a1a1a;
+}
+
+.add-contact-btn:hover {
+    background: #22c55e;
+    transform: scale(1.02);
+}
+
+.add-contact-btn.added {
+    background: #3a3a3a;
+    color: #888;
+    cursor: default;
+}
+
+.remove-contact-btn {
+    background: #3a2a2a;
+    color: #f87171;
+    border: 1px solid #f8717133;
+}
+
+.remove-contact-btn:hover {
+    background: #f871711a;
+    transform: scale(1.02);
+}
 
 .status-dot { 
     width: 8px; 
@@ -1915,4 +2021,344 @@ button, a, div { -webkit-tap-highlight-color: transparent; outline: none; }
     text-align: center;
     padding: 40px;
     color: #666;
+}
+/* ========== CHANNEL INFO SCREEN - MODERN & CLEAN ========== */
+.channel-info-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #1a1a1a;
+    z-index: 1600;
+    display: none;
+    flex-direction: column;
+    animation: fadeIn 0.3s ease;
+}
+
+.channel-info-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: #2a2a2a;
+    border-bottom: 1px solid #3a3a3a;
+}
+
+.channel-info-back-btn {
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.channel-info-back-btn:hover {
+    background: #3a3a3a;
+    color: white;
+}
+
+.channel-info-header h3 {
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.channel-info-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+}
+
+/* HERO SECTION - Avatar & Nama */
+.channel-info-hero {
+    background: linear-gradient(135deg, #2a2a2a, #1f1f1f);
+    padding: 32px 20px 24px;
+    text-align: center;
+    border-bottom: 1px solid #3a3a3a;
+}
+
+.channel-info-avatar {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #353535;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #4ade80;
+}
+
+.channel-info-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.channel-info-name {
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 4px;
+}
+
+.channel-info-username {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 20px;
+}
+
+/* STATS SECTION */
+.channel-info-stats {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    background: #252525;
+    padding: 16px 20px;
+    border-radius: 20px;
+    margin: 0 20px 20px;
+}
+
+.channel-info-stats .stat-item {
+    text-align: center;
+}
+
+.channel-info-stats .stat-item span {
+    display: block;
+    color: #888;
+    font-size: 12px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.channel-info-stats .stat-item strong {
+    display: block;
+    color: white;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+/* INFO CARDS - RATA KIRI SEMUA */
+.channel-info-cards {
+    padding: 0 20px 20px;
+}
+
+.info-card {
+    background: #252525;
+    border-radius: 20px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    transition: all 0.2s;
+}
+
+.info-card:hover {
+    background: #2a2a2a;
+    transform: translateX(4px);
+}
+
+.info-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.info-card-header i {
+    font-size: 18px;
+    width: 28px;
+    color: #4ade80;
+}
+
+.info-card-header span {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.info-card-content {
+    color: white;
+    font-size: 15px;
+    line-height: 1.4;
+    word-break: break-word;
+    padding-left: 28px;
+}
+
+/* ACTION BUTTONS - BIKIN RAPI */
+.channel-action-buttons {
+    display: flex;
+    gap: 12px;
+    margin: 20px 20px 24px;
+}
+
+.action-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 8px;
+    background: #252525;
+    border: none;
+    border-radius: 14px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.action-btn i {
+    font-size: 16px;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Clear chat button */
+.clear-chat-btn {
+    background: #2a2a2a;
+    color: #fbbf24;
+    border: 1px solid #fbbf2433;
+}
+.clear-chat-btn:hover {
+    background: #fbbf241a;
+    border-color: #fbbf24;
+}
+
+/* Report button */
+.report-channel-btn {
+    background: #2a2a2a;
+    color: #f87171;
+    border: 1px solid #f8717133;
+}
+.report-channel-btn:hover {
+    background: #f871711a;
+    border-color: #f87171;
+}
+
+/* Delete channel button */
+.delete-channel-btn {
+    background: #2a2a2a;
+    color: #ef4444;
+    border: 1px solid #ef444433;
+}
+.delete-channel-btn:hover {
+    background: #ef44441a;
+    border-color: #ef4444;
+}
+
+/* Hide buttons for non-owner */
+.action-btn.hidden {
+    display: none;
+}
+
+/* FOOTER */
+.channel-info-footer {
+    text-align: center;
+    padding: 20px;
+    color: #555;
+    font-size: 11px;
+    border-top: 1px solid #3a3a3a;
+    margin-top: 8px;
+}
+
+/* Channel View Header - Bisa diklik */
+.channel-view-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 12px;
+    transition: all 0.2s;
+}
+
+.channel-view-info:hover {
+    background: #3a3a3a;
+}
+
+.channel-view-info img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.channel-view-info h3 {
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.channel-view-info span {
+    font-size: 11px;
+    color: #888;
+}
+/* Typing Indicator */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 0;
+}
+
+.typing-indicator span:not(.typing-text) {
+    width: 6px;
+    height: 6px;
+    background: #888;
+    border-radius: 50%;
+    animation: typingBounce 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: 0s; }
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+.typing-indicator .typing-text {
+    font-size: 11px;
+    color: #888;
+    margin-left: 4px;
+}
+
+@keyframes typingBounce {
+    0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 0.4;
+    }
+    30% {
+        transform: translateY(-6px);
+        opacity: 1;
+    }
+}
+
+/* Sudut lebih tajam */
+.chat-item, .message-bubble, .info-card, .channel-info-stats, .action-btn {
+    border-radius: 14px !important;
+}
+
+.chat-messages .message-bubble {
+    border-radius: 16px !important;
+}
+
+.message.own .message-bubble {
+    border-bottom-right-radius: 4px !important;
+}
+
+.message.other .message-bubble {
+    border-bottom-left-radius: 4px !important;
 }
